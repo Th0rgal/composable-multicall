@@ -1,5 +1,6 @@
 use array::SpanTrait;
 use array::ArrayTrait;
+use core::traits::PartialEq;
 use box::BoxTrait;
 use ecdsa::check_ecdsa_signature;
 use serde::ArraySerde;
@@ -16,7 +17,10 @@ fn _execute_calls(mut calls: Array<Call>) -> Array<Span<felt252>> {
     loop {
         match calls.pop_front() {
             Option::Some(call) => {
-                let _res = _execute_single_call(call);
+                let Call{to, selector, calldata } = call;
+                let compiled_calldata = compile_calldata(calldata.span());
+                let _res = starknet::call_contract_syscall(to, selector, calldata.span())
+                    .unwrap_syscall();
                 res.append(_res);
             },
             Option::None(_) => {
@@ -27,7 +31,21 @@ fn _execute_calls(mut calls: Array<Call>) -> Array<Span<felt252>> {
     res
 }
 
-fn _execute_single_call(call: Call) -> Span<felt252> {
-    let Call{to, selector, calldata } = call;
-    starknet::call_contract_syscall(to, selector, calldata.span()).unwrap_syscall()
+fn compile_calldata(mut calldata: Span<felt252>) -> Array<felt252> {
+    match calldata.pop_front() {
+        Option::Some(felt) => {
+            let mut output_calldata = (if *felt == 0 {
+                *calldata.pop_front().expect('expected a felt after prefix 0')
+            } else if *felt == 1 {
+                let call_id = calldata.pop_front().expect('expected a felt after prefix 1');
+                let resp_id = calldata.pop_front().expect('expected 2 felts after prefix 1');
+                *call_id
+            } else {
+                panic_with_felt252('unexpected prefix')
+            });
+            compile_calldata(calldata);
+            ArrayTrait::new()
+        },
+        Option::None(_) => ArrayTrait::new(),
+    }
 }
