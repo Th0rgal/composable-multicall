@@ -2,8 +2,8 @@ use array::ArrayTrait;
 use result::ResultTrait;
 use starknet::ContractAddress;
 use starknet::contract_address_const;
-use composable_multicall::interfaces::Call;
-use composable_multicall::default_multicall::_execute_calls;
+use multicalls::interfaces::Call;
+use multicalls::default::execute_calls;
 use core::traits::Into;
 
 const TRANSFER_SELECTOR: felt252 = 0x83afd3f4caedc6eebf44246fe54e38c95e3179a5ec9ea81740eca5b482d12e;
@@ -39,5 +39,5 @@ fn test_multicall() {
     calls.append(call1);
     calls.append(call2);
 
-    _execute_calls(calls);
+    execute_calls(calls);
 }

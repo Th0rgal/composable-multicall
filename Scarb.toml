@@ -1,5 +1,5 @@
 [package]
-name = "composable_multicall"
+name = "multicalls"
 version = "0.1.0"
 
 [dependencies]

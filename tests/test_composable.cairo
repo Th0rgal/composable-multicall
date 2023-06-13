@@ -1,4 +1,4 @@
-use composable_multicall::composable_multicall::_execute_calls;
+use multicalls::composable::execute_calls;
 
 #[test]
 fn test_returns_two() {

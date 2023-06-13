@@ -2,5 +2,5 @@
 protostar-version = "0.13.0"
 
 [contracts]
-composable_multicall = ["src"]
+multicalls = ["src"]
 
